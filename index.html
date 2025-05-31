@@ -5,19 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz Oyunu</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #dbeafe; margin: 0; padding: 0; }
-    .container { max-width: 800px; margin: auto; padding: 20px; background-color: #f4f4f9; border-radius: 12px; margin-top: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; color: #333; }
-    .input-group { margin-bottom: 15px; }
-    .input-group label { display: block; margin-bottom: 5px; }
-    .input-group input { width: 100%; padding: 8px; }
-    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
-    #quiz-section { display: none; }
-    .option { padding: 10px; margin: 5px 0; background-color: #eee; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-    .selected { background-color: #cfe2ff; }
-    .correct { background-color: #d4edda !important; }
-    .incorrect { background-color: #f8d7da !important; }
-    #question { white-space: pre-wrap; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e0f2fe;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #1e3a8a;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #1f2937;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      background-color: #3b82f6;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #2563eb;
+    }
+
+    #quiz-section {
+      display: none;
+    }
+
+    #status {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #question {
+      font-size: 18px;
+      margin: 20px 0;
+      white-space: pre-wrap;
+    }
+
+    .option {
+      padding: 12px;
+      margin: 8px 0;
+      background-color: #f1f5f9;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option:hover {
+      background-color: #e0e7ff;
+    }
+
+    .selected {
+      background-color: #bfdbfe;
+    }
+
+    .correct {
+      background-color: #d1fae5 !important;
+    }
+
+    .incorrect {
+      background-color: #fee2e2 !important;
+    }
+
+    #feedback {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .button-group {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .button-group button {
+      margin: 0 10px;
+    }
   </style>
 </head>
 <body>
@@ -36,7 +132,9 @@
         <label for="count">Sual sayı:</label>
         <input type="number" id="count">
       </div>
-      <button onclick="startQuiz()">Sınağa Başla</button>
+      <div class="button-group">
+        <button onclick="startQuiz()">Sınağa Başla</button>
+      </div>
     </div>
 
     <div id="quiz-section">
@@ -44,8 +142,10 @@
       <h2 id="question"></h2>
       <div id="options"></div>
       <p id="feedback"></p>
-      <button id="check-btn" onclick="checkAnswer()" disabled>Cavabla</button>
-      <button id="next-btn" onclick="nextQuestion()" disabled>Növbəti</button>
+      <div class="button-group">
+        <button id="check-btn" onclick="checkAnswer()" disabled>Cavabla</button>
+        <button id="next-btn" onclick="nextQuestion()" disabled>Növbəti</button>
+      </div>
     </div>
   </div>
 
@@ -66,7 +166,6 @@
         line = line.trim();
         if (!line) continue;
 
-        // cavab başlanırsa
         if (line.startsWith('•') || line.startsWith('√')) {
           answers.push(line);
         } else {
@@ -114,7 +213,7 @@
       document.getElementById('next-btn').disabled = true;
 
       const [q, answers] = selectedQuestions[currentIndex];
-      document.getElementById('status').textContent = `Sual ${currentIndex + 1}/${selectedQuestions.length}`;
+      document.getElementById('status').textContent = `Sual ${currentIndex + 1} / ${selectedQuestions.length}`;
       document.getElementById('question').textContent = q;
 
       const optionsContainer = document.getElementById('options');
@@ -123,7 +222,7 @@
 
       for (let ans of shuffled) {
         const div = document.createElement('div');
-        div.textContent = ans.slice(1);
+        div.textContent = ans.slice(1).trim();
         div.className = 'option';
         div.onclick = () => {
           if (document.querySelector('.correct') || document.querySelector('.incorrect')) return;
@@ -147,7 +246,7 @@
         feedback.style.color = 'green';
         document.querySelector('.selected').classList.add('correct');
       } else {
-        feedback.textContent = `❌ Səhv! Düzgün cavab: ${correct}`;
+        feedback.textContent = `❌ Səhv cavab. Düzgün cavab: ${correct}`;
         feedback.style.color = 'red';
         if (document.querySelector('.selected'))
           document.querySelector('.selected').classList.add('incorrect');
@@ -162,7 +261,7 @@
       if (currentIndex < selectedQuestions.length) {
         loadQuestion();
       } else {
-        alert(`Oyun bitdi! Düzgün cavablar: ${score}/${selectedQuestions.length}`);
+        alert(`Oyun bitdi! Düzgün cavablar: ${score} / ${selectedQuestions.length}`);
         location.reload();
       }
     }
