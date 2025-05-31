@@ -310,15 +310,13 @@ bölünməlidir;
 • zetta
 √ alfa
 51. Nüvə partlayışında tam dağılma zonası nə ilə xarakterizə olunur?
-√
-50 kPa-dan artıq təzyiqdə yanğınlar baş vermir, istehsalat və yaşayış binaları tamamilə dağılır. Ona görə də dağıntılarda yanma yox,
+√ 50 kPa-dan artıq təzyiqdə yanğınlar baş vermir, istehsalat və yaşayış binaları tamamilə dağılır. Ona görə də dağıntılarda yanma yox,
 tüstülənmə müşahidə olunur
 • 30-50 kPa Həddində təzyiq , qismən yanğınlar və bina və tikililərin natamam dağılması (deformasiyalar və yerdəyişmələr)
 • 20-30 kPa həddində təzyiq, partlayış zonasında davamlı yanğınlar, bina və tikililərin qismən məhv edilməsi
 • 10-20 kPa-dan çox təzyiq, ərazidə müxtəlif yerlərdə yanğınlar, bina və tikililərin tamamilə məhv edilməsi
-•
-yüngül radiasiya ilə alovlanan binalar və obyektlər səpələnir və dağıntılarla örtülür, alov ultrabənövşəyi və infraqırmızı şüalarla sökülür
-(hər yerdə partlayışlar və tıxanmalar)
+• yüngül radiasiya ilə alovlanan binalar və obyektlər səpələnir və dağıntılarla örtülür, alov ultrabənövşəyi və infraqırmızı şüalarla sökülür
+ (hər yerdə partlayışlar və tıxanmalar)
 52. Üçüncü dərəcəli yanıqda dəridə nə baş verir?
 • Dəridə suluqların deşilməsi
 • Dəridə bütün dərinliyində toxumalara təsirinin zəif olması
