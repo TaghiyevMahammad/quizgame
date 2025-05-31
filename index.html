@@ -11,7 +11,6 @@
       margin: 0;
       padding: 0;
     }
-
     .container {
       max-width: 700px;
       margin: 50px auto;
@@ -20,30 +19,25 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-
     h1, h2 {
       text-align: center;
       color: #1e3a8a;
     }
-
     .input-group {
       margin-bottom: 20px;
     }
-
     .input-group label {
       display: block;
       margin-bottom: 6px;
       font-weight: bold;
       color: #1f2937;
     }
-
     .input-group input {
       width: 100%;
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
-
     button {
       padding: 12px 24px;
       font-size: 16px;
@@ -54,27 +48,22 @@
       cursor: pointer;
       transition: background-color 0.2s ease-in-out;
     }
-
     button:hover {
       background-color: #2563eb;
     }
-
     #quiz-section {
       display: none;
     }
-
     #status {
       font-weight: bold;
       text-align: center;
       margin-bottom: 10px;
     }
-
     #question {
       font-size: 18px;
       margin: 20px 0;
       white-space: pre-wrap;
     }
-
     .option {
       padding: 12px;
       margin: 8px 0;
@@ -83,34 +72,27 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-
     .option:hover {
       background-color: #e0e7ff;
     }
-
     .selected {
       background-color: #bfdbfe;
     }
-
     .correct {
       background-color: #d1fae5 !important;
     }
-
     .incorrect {
       background-color: #fee2e2 !important;
     }
-
     #feedback {
       margin-top: 10px;
       font-weight: bold;
       text-align: center;
     }
-
     .button-group {
       text-align: center;
       margin-top: 20px;
     }
-
     .button-group button {
       margin: 0 10px;
     }
@@ -161,31 +143,35 @@
       const text = await response.text();
       const lines = text.split('\n');
 
-      let questionList = [], currentQ = '', answers = [], isReadingQuestion = true;
+      let questionList = [];
+      let currentQuestion = '';
+      let answers = [];
+      let readingAnswers = false;
 
       for (let line of lines) {
         line = line.trim();
         if (!line) continue;
 
-        if (line.startsWith('•') || line.startsWith('√')) {
-          isReadingQuestion = false;
-          answers.push(line);
-        } else if (!isReadingQuestion && (line.startsWith('•') || line.startsWith('√'))) {
-          answers.push(line);
-        } else {
-          if (answers.length > 0 && currentQ) {
-            questionList.push([currentQ.trim(), answers]);
-            currentQ = line + ' ';
+        if (line[0].match(/^\d/) && line.includes('.')) {
+          if (currentQuestion && answers.length) {
+            questionList.push([currentQuestion.trim(), answers]);
+            currentQuestion = '';
             answers = [];
-            isReadingQuestion = true;
-          } else {
-            currentQ += line + ' ';
           }
+          currentQuestion = line;
+          readingAnswers = false;
+        } else if (line.startsWith('•') || line.startsWith('√')) {
+          answers.push(line);
+          readingAnswers = true;
+        } else if (readingAnswers && answers.length) {
+          answers[answers.length - 1] += ' ' + line;
+        } else {
+          currentQuestion += ' ' + line;
         }
       }
 
-      if (currentQ && answers.length > 0) {
-        questionList.push([currentQ.trim(), answers]);
+      if (currentQuestion && answers.length) {
+        questionList.push([currentQuestion.trim(), answers]);
       }
 
       return questionList;
