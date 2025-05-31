@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Oyunu</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #dbeafe; margin: 0; padding: 0; }
+    .container { max-width: 800px; margin: auto; padding: 20px; background-color: #f4f4f9; border-radius: 12px; margin-top: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #333; }
+    .input-group { margin-bottom: 15px; }
+    .input-group label { display: block; margin-bottom: 5px; }
+    .input-group input { width: 100%; padding: 8px; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+    #quiz-section { display: none; }
+    .option { padding: 10px; margin: 5px 0; background-color: #eee; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .selected { background-color: #cfe2ff; }
+    .correct { background-color: #d4edda !important; }
+    .incorrect { background-color: #f8d7da !important; }
+    #question { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="start-section">
+      <h1>Quiz Oyunu</h1>
+      <div class="input-group">
+        <label for="start">Başlanğıc sual nömrəsi:</label>
+        <input type="number" id="start">
+      </div>
+      <div class="input-group">
+        <label for="end">Son sual nömrəsi:</label>
+        <input type="number" id="end">
+      </div>
+      <div class="input-group">
+        <label for="count">Sual sayı:</label>
+        <input type="number" id="count">
+      </div>
+      <button onclick="startQuiz()">Sınağa Başla</button>
+    </div>
+
+    <div id="quiz-section">
+      <p id="status"></p>
+      <h2 id="question"></h2>
+      <div id="options"></div>
+      <p id="feedback"></p>
+      <button id="check-btn" onclick="checkAnswer()" disabled>Cavabla</button>
+      <button id="next-btn" onclick="nextQuestion()" disabled>Növbəti</button>
+    </div>
+  </div>
+
+  <script>
+    let questions = [];
+    let selectedQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let selectedAnswer = null;
+
+    async function loadQuestions() {
+      const response = await fetch('MM.txt');
+      const text = await response.text();
+      const lines = text.split('\n');
+      let questionList = [], currentQ = '', answers = [];
+
+      for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+
+        // cavab başlanırsa
+        if (line.startsWith('•') || line.startsWith('√')) {
+          answers.push(line);
+        } else {
+          if (answers.length > 0 && currentQ) {
+            questionList.push([currentQ.trim(), answers]);
+            currentQ = '';
+            answers = [];
+          }
+          currentQ += line + ' ';
+        }
+      }
+
+      if (currentQ && answers.length > 0) {
+        questionList.push([currentQ.trim(), answers]);
+      }
+
+      return questionList;
+    }
+
+    async function startQuiz() {
+      questions = await loadQuestions();
+      const start = parseInt(document.getElementById('start').value) - 1;
+      const end = parseInt(document.getElementById('end').value);
+      const count = parseInt(document.getElementById('count').value);
+
+      if (isNaN(start) || isNaN(end) || isNaN(count) || start < 0 || end > questions.length || start >= end) {
+        alert("Düzgün aralıq daxil edin.");
+        return;
+      }
+
+      selectedQuestions = questions.slice(start, end);
+      selectedQuestions = selectedQuestions.sort(() => 0.5 - Math.random()).slice(0, count);
+
+      document.getElementById('start-section').style.display = 'none';
+      document.getElementById('quiz-section').style.display = 'block';
+      currentIndex = 0;
+      score = 0;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      selectedAnswer = null;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('check-btn').disabled = true;
+      document.getElementById('next-btn').disabled = true;
+
+      const [q, answers] = selectedQuestions[currentIndex];
+      document.getElementById('status').textContent = `Sual ${currentIndex + 1}/${selectedQuestions.length}`;
+      document.getElementById('question').textContent = q;
+
+      const optionsContainer = document.getElementById('options');
+      optionsContainer.innerHTML = '';
+      const shuffled = [...answers].sort(() => 0.5 - Math.random());
+
+      for (let ans of shuffled) {
+        const div = document.createElement('div');
+        div.textContent = ans.slice(1);
+        div.className = 'option';
+        div.onclick = () => {
+          if (document.querySelector('.correct') || document.querySelector('.incorrect')) return;
+          document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+          div.classList.add('selected');
+          selectedAnswer = ans;
+          document.getElementById('check-btn').disabled = false;
+        };
+        optionsContainer.appendChild(div);
+      }
+    }
+
+    function checkAnswer() {
+      const correctAnswer = selectedQuestions[currentIndex][1].find(a => a.startsWith('√'));
+      const correct = correctAnswer ? correctAnswer.slice(1).trim() : "Tapılmadı";
+      const feedback = document.getElementById('feedback');
+
+      if (selectedAnswer && selectedAnswer.startsWith('√')) {
+        score++;
+        feedback.textContent = '✅ Düzgün cavab!';
+        feedback.style.color = 'green';
+        document.querySelector('.selected').classList.add('correct');
+      } else {
+        feedback.textContent = `❌ Səhv! Düzgün cavab: ${correct}`;
+        feedback.style.color = 'red';
+        if (document.querySelector('.selected'))
+          document.querySelector('.selected').classList.add('incorrect');
+      }
+
+      document.getElementById('check-btn').disabled = true;
+      document.getElementById('next-btn').disabled = false;
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex < selectedQuestions.length) {
+        loadQuestion();
+      } else {
+        alert(`Oyun bitdi! Düzgün cavablar: ${score}/${selectedQuestions.length}`);
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>
